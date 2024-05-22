@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class selectMenu extends JFrame implements ActionListener {
 
@@ -13,9 +15,27 @@ public class selectMenu extends JFrame implements ActionListener {
     private JLabel timerLabel;
     private Timer timer;
     private int timeRemaining = 200;
+    private Map<String, Integer> menuPrices;
 
     public selectMenu(String selectedOption) {
         this.selectedOption = selectedOption;
+
+        // 메뉴와 가격 데이터 초기화
+        menuPrices = new HashMap<>();
+        menuPrices.put("불고기버거세트", 7000);
+        menuPrices.put("치즈버거세트", 6500);
+        menuPrices.put("새우버거세트", 6800);
+        menuPrices.put("치킨버거세트", 7000);
+        menuPrices.put("불고기버거", 4000);
+        menuPrices.put("치즈버거", 3500);
+        menuPrices.put("새우버거", 3800);
+        menuPrices.put("치킨버거", 4000);
+        menuPrices.put("콜라", 1500);
+        menuPrices.put("사이다", 1500);
+        menuPrices.put("밀크쉐이크", 2500);
+        menuPrices.put("치킨너겟", 3000);
+        menuPrices.put("치즈스틱", 2500);
+        menuPrices.put("양념감자", 2000);
 
         // 창의 제목 설정
         setTitle("메뉴 선택 화면");
@@ -111,7 +131,10 @@ public class selectMenu extends JFrame implements ActionListener {
                 showSideMenu();
                 break;
             default:
-                cartModel.addElement(command);
+                if (menuPrices.containsKey(command)) {
+                    int price = menuPrices.get(command);
+                    cartModel.addElement(command + " - " + price + "원");
+                }
                 break;
         }
     }
@@ -172,7 +195,6 @@ public class selectMenu extends JFrame implements ActionListener {
                 timerLabel.setText("남은 시간 : " + timeRemaining + " 초");
                 if (timeRemaining <= 0) {
                     timer.stop();
-                    //JOptionPane.showMessageDialog(null, "Time is up!");
                     restartApplication();
                 }
             }
