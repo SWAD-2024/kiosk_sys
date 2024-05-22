@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -182,7 +184,7 @@ public class selectMenu extends JFrame implements ActionListener {
         // 현재 창 닫기
         this.dispose();
 
-        // startMenuSelect 창 열기
+        // src.startMenuSelect 창 열기
         new startMenuSelect();
     }
 

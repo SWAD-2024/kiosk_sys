@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +22,7 @@ public class startMenuSelect extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // 배경 패널 생성 및 설정
-        BackgroundPanel background = new BackgroundPanel(new ImageIcon("hamburger.png").getImage());
+        BackgroundPanel background = new BackgroundPanel(new ImageIcon("src/hamburger.png").getImage());
 
         // 레이아웃 설정
         background.setLayout(new BorderLayout());
@@ -73,7 +75,7 @@ public class startMenuSelect extends JFrame implements ActionListener {
         // 선택된 옵션을 저장하는 코드 추가 가능 (파일, 데이터베이스 등)
         System.out.println("선택된 옵션: " + selectedOption);
 
-        // selectMenu.java 실행
+        // src.selectMenu.java 실행
         new selectMenu(selectedOption);
 
         // 현재 창 닫기
@@ -82,7 +84,7 @@ public class startMenuSelect extends JFrame implements ActionListener {
 
 //    public static void main(String[] args) {
 //        // 프로그램 실행
-//        new startMenuSelect();
+//        new src.startMenuSelect();
 //    }
 
     // 배경 이미지를 그리기 위한 커스텀 패널 클래스
