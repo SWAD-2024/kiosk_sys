@@ -80,10 +80,10 @@ public class startMenuSelect extends JFrame implements ActionListener {
         dispose();
     }
 
-    public static void main(String[] args) {
-        // 프로그램 실행
-        new startMenuSelect();
-    }
+//    public static void main(String[] args) {
+//        // 프로그램 실행
+//        new startMenuSelect();
+//    }
 
     // 배경 이미지를 그리기 위한 커스텀 패널 클래스
     class BackgroundPanel extends JPanel {
