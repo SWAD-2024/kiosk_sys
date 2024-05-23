@@ -1,4 +1,4 @@
-# kiosk_sys
+# 2024-SWAD-KioskSystem
 
 ## Team 단쏘맹 🍉
 |<img src="https://avatars.githubusercontent.com/u/89590797?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/118244436?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/109409651?v=4" width="150" height="150"/>|
