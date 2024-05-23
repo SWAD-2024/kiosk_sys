@@ -485,8 +485,4 @@ public class selectMenu extends JFrame implements ActionListener {
         repaint();
     }
 
-    public static void main(String[] args) {
-        // 예시로 실행해보기 위한 코드 (실제 사용 시 startMenuSelect에서 호출됨)
-        new selectMenu("포장");
-    }
 }
