@@ -1,11 +1,6 @@
 # kiosk_sys
 
-<table>
-  <tbody>
-    <tr>
-      <td align="center"><a href=""><img src="width="100px;" alt=""/><br /><sub><b> 강다인 </b></sub></a><br /></td>
-      <td align="center"><a href=""><img src="" width="100px;" alt=""/><br /><sub><b> 김현수 </b></sub></a><br /></td>
-      <td align="center"><a href=""><img src="" width="100px;" alt=""/><br /><sub><b> 전소현 </b></sub></a><br /></td>
-    </tr>
-  </tbody>
-</table>
+## Team
+|<img src="https://avatars.githubusercontent.com/u/89590797?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/118244436?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/109409651?v=4" width="150" height="150"/>|
+|:-:|:-:|:-:|
+|maeng<br/>[@maeng-kim](https://github.com/maeng-kim)|dain<br/>[@kang-dain](https://github.com/kang-dain)|[@ssohy](https://github.com/ssohy)|
