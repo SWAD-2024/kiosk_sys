@@ -17,6 +17,8 @@ public class selectMenu extends JFrame implements ActionListener {
     private int timeRemaining = 200;
     private Map<String, Integer> menuPrices;
     private JLabel totalPriceLabel;
+    //강다인이 추가함
+    private int totalPrice = 0;
 
     public selectMenu(String selectedOption) {
         this.selectedOption = selectedOption;
@@ -380,8 +382,9 @@ public class selectMenu extends JFrame implements ActionListener {
         updateTotalPrice();
     }
 
+
     private void updateTotalPrice() {
-        int totalPrice = 0;
+        totalPrice = 0;
         for (int i = 0; i < cartModel.getSize(); i++) {
             String cartItem = cartModel.getElementAt(i);
             int priceIndex = cartItem.lastIndexOf(" - ");
@@ -389,6 +392,18 @@ public class selectMenu extends JFrame implements ActionListener {
                 totalPrice += Integer.parseInt(cartItem.substring(priceIndex + 3, cartItem.length() - 1));
             }
         }
+        updateTotalPriceLabel();  // 총 금액 라벨 업데이트
+    }
+
+    //강다인이 applyDiscount, updateTotalPriceLabel메서드 추가함!!!!!!
+    public void applyDiscount(int percentage) {
+        int discountAmount = totalPrice * percentage / 100;
+        totalPrice -= discountAmount;
+        updateTotalPriceLabel();  // 총 금액 라벨 업데이트
+    }
+
+    // 총 금액 라벨 업데이트 메서드 추가
+    private void updateTotalPriceLabel() {
         totalPriceLabel.setText("총 금액: " + totalPrice + "원");
     }
 
@@ -465,18 +480,34 @@ public class selectMenu extends JFrame implements ActionListener {
             }
         });
 
+        //강다인이 추가함!!!!!!
+        //applyCouponButton버튼 추가
+        JButton applyCouponButton = new JButton("쿠폰 적용");
+        applyCouponButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new applyCoupon(selectMenu.this);
+            }
+        });
+
         JButton confirmPaymentButton = new JButton("결제");
         confirmPaymentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 결제 처리 로직 추가
-                JOptionPane.showMessageDialog(selectMenu.this, "결제가 완료되었습니다.");
+                //JOptionPane.showMessageDialog(selectMenu.this, "결제가 완료되었습니다.");
+                new makePayment(totalPrice);
+                /*
+                //강다인이 위에 주석처리하고 아래 코드 추가함!
+                new applyCoupon(selectMenu.this);
                 dispose();
                 new startMenuSelect(); // 처음 화면으로 돌아가기
+                */
             }
         });
 
         buttonPanel.add(backButton);
+        buttonPanel.add(applyCouponButton); //강다인이 추가함
         buttonPanel.add(confirmPaymentButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
