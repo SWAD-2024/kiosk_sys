@@ -11,13 +11,13 @@ public class selectMenu extends JFrame implements ActionListener {
 
     private String selectedOption;
     private JPanel menuPanel;
-    private DefaultListModel<String> cartModel;
+    private JPanel cartPanel;
+    private JPanel cartItemsPanel;
     private JLabel timerLabel;
     private Timer timer;
     private int timeRemaining = 200;
     private Map<String, Integer> menuPrices;
     private JLabel totalPriceLabel;
-    //강다인이 추가함
     private int totalPrice = 0;
 
     public selectMenu(String selectedOption) {
@@ -80,11 +80,15 @@ public class selectMenu extends JFrame implements ActionListener {
         bottomPanel.setLayout(new BorderLayout());
 
         // 장바구니 패널 생성
-        JPanel cartPanel = new JPanel();
+        cartPanel = new JPanel();
         cartPanel.setLayout(new BorderLayout());
-        cartModel = new DefaultListModel<>();
-        JList<String> cartList = new JList<>(cartModel);
-        cartPanel.add(new JScrollPane(cartList), BorderLayout.CENTER);
+        cartPanel.setPreferredSize(new Dimension(600, 300));
+
+        cartItemsPanel = new JPanel();
+        cartItemsPanel.setLayout(new BoxLayout(cartItemsPanel, BoxLayout.Y_AXIS));
+        JScrollPane cartScrollPane = new JScrollPane(cartItemsPanel);
+        cartScrollPane.setPreferredSize(new Dimension(600, 300));
+        cartPanel.add(cartScrollPane, BorderLayout.CENTER);
 
         // 결제 및 타이머 패널 생성
         JPanel paymentPanel = new JPanel();
@@ -95,7 +99,7 @@ public class selectMenu extends JFrame implements ActionListener {
         paymentPanel.add(totalPriceLabel, BorderLayout.NORTH);
 
         // 타이머 라벨 추가
-        timerLabel = new JLabel("Time remaining: " + timeRemaining + " seconds", JLabel.CENTER);
+        timerLabel = new JLabel("남은 시간: " + timeRemaining + " 초", JLabel.CENTER);
         paymentPanel.add(timerLabel, BorderLayout.CENTER);
 
         // 결제 버튼 추가
@@ -150,7 +154,7 @@ public class selectMenu extends JFrame implements ActionListener {
                     } else if (command.contains("버거")) {
                         showDetailOptions(command, true, false);
                     } else {
-                        addItemToCart(command);
+                        addItemToCart(command, menuPrices.get(command));
                     }
                 }
                 break;
@@ -323,28 +327,7 @@ public class selectMenu extends JFrame implements ActionListener {
                     }
                 }
 
-                // 장바구니에 동일한 아이템이 있는지 확인
-                boolean found = false;
-                for (int i = 0; i < cartModel.getSize(); i++) {
-                    String cartItem = cartModel.getElementAt(i);
-                    if (cartItem.startsWith(itemDescription.toString())) {
-                        found = true;
-                        int countIndex = cartItem.indexOf(" x");
-                        if (countIndex != -1) {
-                            int count = Integer.parseInt(cartItem.substring(countIndex + 2)) + 1;
-                            cartModel.set(i, itemDescription.toString() + " x" + count + " - " + price * count + "원");
-                        } else {
-                            cartModel.set(i, itemDescription.toString() + " x2 - " + price * 2 + "원");
-                        }
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    cartModel.addElement(itemDescription.toString() + " - " + price + "원");
-                }
-
-                updateTotalPrice();
+                addItemToCart(itemDescription.toString(), price);
                 detailFrame.dispose();
             }
         });
@@ -354,55 +337,39 @@ public class selectMenu extends JFrame implements ActionListener {
         detailFrame.setVisible(true);
     }
 
-    private void addItemToCart(String selectedItem) {
-        int price = menuPrices.get(selectedItem);
-        StringBuilder itemDescription = new StringBuilder(selectedItem);
-
-        // 장바구니에 동일한 아이템이 있는지 확인
+    private void addItemToCart(String itemDescription, int price) {
         boolean found = false;
-        for (int i = 0; i < cartModel.getSize(); i++) {
-            String cartItem = cartModel.getElementAt(i);
-            if (cartItem.startsWith(itemDescription.toString())) {
+        for (int i = 0; i < cartItemsPanel.getComponentCount(); i++) {
+            CartItemPanel cartItemPanel = (CartItemPanel) cartItemsPanel.getComponent(i);
+            if (cartItemPanel.getItemDescription().equals(itemDescription)) {
+                cartItemPanel.incrementQuantity();
                 found = true;
-                int countIndex = cartItem.indexOf(" x");
-                if (countIndex != -1) {
-                    int count = Integer.parseInt(cartItem.substring(countIndex + 2)) + 1;
-                    cartModel.set(i, itemDescription.toString() + " x" + count + " - " + price * count + "원");
-                } else {
-                    cartModel.set(i, itemDescription.toString() + " x2 - " + price * 2 + "원");
-                }
                 break;
             }
         }
 
         if (!found) {
-            cartModel.addElement(itemDescription.toString() + " - " + price + "원");
+            cartItemsPanel.add(new CartItemPanel(itemDescription, price));
         }
 
         updateTotalPrice();
     }
 
-
     private void updateTotalPrice() {
         totalPrice = 0;
-        for (int i = 0; i < cartModel.getSize(); i++) {
-            String cartItem = cartModel.getElementAt(i);
-            int priceIndex = cartItem.lastIndexOf(" - ");
-            if (priceIndex != -1) {
-                totalPrice += Integer.parseInt(cartItem.substring(priceIndex + 3, cartItem.length() - 1));
-            }
+        for (Component comp : cartItemsPanel.getComponents()) {
+            CartItemPanel cartItemPanel = (CartItemPanel) comp;
+            totalPrice += cartItemPanel.getTotalPrice();
         }
-        updateTotalPriceLabel();  // 총 금액 라벨 업데이트
+        updateTotalPriceLabel();
     }
 
-    //강다인이 applyDiscount, updateTotalPriceLabel메서드 추가함!!!!!!
     public void applyDiscount(int percentage) {
         int discountAmount = totalPrice * percentage / 100;
         totalPrice -= discountAmount;
-        updateTotalPriceLabel();  // 총 금액 라벨 업데이트
+        updateTotalPriceLabel();
     }
 
-    // 총 금액 라벨 업데이트 메서드 추가
     private void updateTotalPriceLabel() {
         totalPriceLabel.setText("총 금액: " + totalPrice + "원");
     }
@@ -411,16 +378,17 @@ public class selectMenu extends JFrame implements ActionListener {
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
-        DefaultListModel<String> summaryModel = new DefaultListModel<>();
-        for (int i = 0; i < cartModel.getSize(); i++) {
-            summaryModel.addElement(cartModel.getElementAt(i));
+        JPanel summaryPanel = new JPanel();
+        summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+        for (Component comp : cartItemsPanel.getComponents()) {
+            CartItemPanel cartItemPanel = (CartItemPanel) comp;
+            summaryPanel.add(new JLabel(cartItemPanel.getItemDescription() + " - " + cartItemPanel.getTotalPrice() + "원"));
         }
 
-        JList<String> summaryList = new JList<>(summaryModel);
-        add(new JScrollPane(summaryList), BorderLayout.CENTER);
+        add(new JScrollPane(summaryPanel), BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(3, 1));
+        buttonPanel.setLayout(new GridLayout(4, 1));
 
         JLabel totalSummaryPriceLabel = new JLabel(totalPriceLabel.getText(), JLabel.CENTER);
         buttonPanel.add(totalSummaryPriceLabel);
@@ -452,8 +420,7 @@ public class selectMenu extends JFrame implements ActionListener {
 
                 JPanel cartPanel = new JPanel();
                 cartPanel.setLayout(new BorderLayout());
-                JList<String> cartList = new JList<>(cartModel);
-                cartPanel.add(new JScrollPane(cartList), BorderLayout.CENTER);
+                cartPanel.add(new JScrollPane(cartItemsPanel), BorderLayout.CENTER);
 
                 JPanel paymentPanel = new JPanel();
                 paymentPanel.setLayout(new BorderLayout());
@@ -480,8 +447,6 @@ public class selectMenu extends JFrame implements ActionListener {
             }
         });
 
-        //강다인이 추가함!!!!!!
-        //applyCouponButton버튼 추가
         JButton applyCouponButton = new JButton("쿠폰 적용");
         applyCouponButton.addActionListener(new ActionListener() {
             @Override
@@ -494,20 +459,12 @@ public class selectMenu extends JFrame implements ActionListener {
         confirmPaymentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 결제 처리 로직 추가
-                //JOptionPane.showMessageDialog(selectMenu.this, "결제가 완료되었습니다.");
                 new makePayment(totalPrice);
-                /*
-                //강다인이 위에 주석처리하고 아래 코드 추가함!
-                new applyCoupon(selectMenu.this);
-                dispose();
-                new startMenuSelect(); // 처음 화면으로 돌아가기
-                */
             }
         });
 
         buttonPanel.add(backButton);
-        buttonPanel.add(applyCouponButton); //강다인이 추가함
+        buttonPanel.add(applyCouponButton);
         buttonPanel.add(confirmPaymentButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -515,5 +472,81 @@ public class selectMenu extends JFrame implements ActionListener {
         revalidate();
         repaint();
     }
+//새로 추가한 패널 (그,, +,- 수량용)
+    private class CartItemPanel extends JPanel {
+        private JLabel itemLabel;
+        private JButton plusButton;
+        private JButton minusButton;
+        private JButton removeButton;
+        private int quantity;
+        private int price;
+        private String itemDescription;
 
+        public CartItemPanel(String itemDescription, int price) {
+            this.itemDescription = itemDescription;
+            this.price = price;
+            this.quantity = 1;
+
+            setLayout(new BorderLayout());
+
+            itemLabel = new JLabel(getItemDescription());
+            plusButton = new JButton("+");
+            minusButton = new JButton("-");
+            removeButton = new JButton("삭제");
+
+            plusButton.addActionListener(e -> {
+                incrementQuantity();
+                updateCart();
+            });
+
+            minusButton.addActionListener(e -> {
+                decrementQuantity();
+                updateCart();
+            });
+
+            removeButton.addActionListener(e -> {
+                cartItemsPanel.remove(this);
+                updateCart();
+            });
+
+            JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+            buttonPanel.add(minusButton);
+            buttonPanel.add(plusButton);
+            buttonPanel.add(removeButton);
+
+            add(itemLabel, BorderLayout.CENTER);
+            add(buttonPanel, BorderLayout.EAST);
+        }
+
+        public String getItemDescription() {
+            return itemDescription + " x" + quantity;
+        }
+
+        public int getTotalPrice() {
+            return quantity * price;
+        }
+
+        public void incrementQuantity() {
+            quantity++;
+            itemLabel.setText(getItemDescription());
+        }
+
+        public void decrementQuantity() {
+            if (quantity > 1) {
+                quantity--;
+                itemLabel.setText(getItemDescription());
+            }
+        }
+
+        private void updateCart() {
+            itemLabel.setText(getItemDescription());
+            updateTotalPrice();
+            cartItemsPanel.revalidate();
+            cartItemsPanel.repaint();
+        }
+    }
+
+    public static void main(String[] args) {
+        new selectMenu("포장");
+    }
 }
