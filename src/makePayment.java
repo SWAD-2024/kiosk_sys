@@ -4,10 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class makePayment extends JFrame {
 
     private int totalPrice;
+    private static AtomicInteger waitingNumber = new AtomicInteger(1);
 
     public makePayment(int totalPrice) {
         this.totalPrice = totalPrice;
@@ -34,8 +36,13 @@ public class makePayment extends JFrame {
     }
 
     private void processPayment() {
-        // 결제 처리 로직 (여기서는 간단히 메시지로 처리)
-        JOptionPane.showMessageDialog(this, "결제가 완료되었습니다.");
+        // 결제 처리 로직
+        int currentWaitingNumber = generateWaitingNumber();
+        JOptionPane.showMessageDialog(this, "결제가 완료되었습니다.\n대기번호: " + currentWaitingNumber);
         dispose();
+    }
+
+    private int generateWaitingNumber() {
+        return waitingNumber.getAndIncrement();
     }
 }
